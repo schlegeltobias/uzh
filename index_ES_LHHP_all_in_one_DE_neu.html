@@ -1,0 +1,864 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Innovationseffekte über die Zeit</title>
+    <link rel="shortcut icon" href="#">
+    <style>
+ 
+/*----------------*/
+/*Layout the grid-*/
+/*----------------*/
+
+.wrapper {
+  display: grid;
+  grid-gap: 0px;
+  grid-template-rows: repeat(auto-fill, 15em);
+  grid-template-columns: repeat(auto-fill, 20em);
+}
+
+#es_results_interactive { 
+  grid-column: 1 / -1;
+}
+
+/* @media screen and (min-width: 1000px) {
+  #es_results_interactive {
+    grid-column: 1 / 6;
+  }
+
+} */
+
+/*----*/
+/*Font*/
+/*----*/
+body {
+  font-family: Arial, Helvetica, sans-serif, sans-serif;
+}
+
+text {
+    font-size: 1rem;
+}
+
+/*-------------------------*/
+/*Formating Paragraph Style*/
+/*-------------------------*/
+
+.choose_precondition, .choose_quartile {
+    font-weight: 700;
+    margin: 0;
+}
+
+/*--------------------/*
+/*Formating Checkboxes/*
+/*--------------------/*
+
+/* Customize the label (the container1) */
+.container1 {
+    display: block;
+    position: relative;
+    padding-left: 35px;
+    cursor: pointer;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+  }
+  
+  /* Hide the browser's default radio button */
+  .container1 input {
+    position: absolute;
+    opacity: 0;
+    cursor: pointer;
+    height: 0;
+    width: 0;
+  }
+  
+  /* Create a custom radio button */
+  .checkmark_es {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 25px;
+    width: 25px;
+    background-color: #eee;
+    border-radius: 50%;
+    
+  }
+  
+  /* On mouse-over, add a grey background color */
+  .container1:hover input ~ .checkmark_es {
+    background-color: #ccc;
+  }
+
+ 
+  /* When the radio button is checked, add a purple background */
+  .container1 input:checked ~ .checkmark_es {
+    background-color: rgb(49,130,189);
+  }
+  
+  /* Create the indicator (the dot/circle - hidden when not checked) */
+  .checkmark_es:after {
+    content: "";
+    position: absolute;
+    display: none;
+  }
+  
+  /* Show the indicator (dot/circle) when checked */
+  .container1 input:checked ~ .checkmark_es:after {
+    display: block;
+  }
+  
+  /* Style the indicator (dot/circle) */
+  .container1 .checkmark_es:after {
+    top: 7.5px;
+    left: 7.5px;
+    bottom: 7.5px;
+    right: 7.5px;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: white;
+  } 
+
+/*------------------*/
+/*Formating Tooltips*/
+/*------------------*/
+
+  div.mytooltip {
+    position: absolute;
+    text-align: center;
+    padding: .5rem;
+    background: #F2F2F2;
+    border: none; 
+    pointer-events: none; 
+    white-space: pre-line;
+}
+
+
+/*-----------------*/
+/*Formating Slider */
+/*-----------------*/
+
+/*Appearance of slider band */
+#quartile_slider {
+  transform: rotate(90deg);
+  position: absolute;
+ -webkit-appearance: none;
+  appearance: none;
+  width: 175px;
+  height: 25px;
+  background: rgba(230,230,230,0.5);
+  outline: none;
+  opacity: 0.7;
+  -webkit-transition: .2s;
+  transition: opacity .2s;
+  border-radius: 10px;
+  border: none;
+  margin-left: -70px;
+  margin-top: 75px;
+  }
+
+
+/*Appearance of slider item*/
+#quartile_slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 30px;
+  height: 25px;
+  background: rgba(49,130,189,0.8);
+  cursor: pointer;
+  border: none;
+  border-radius: 10px
+}
+
+/*Appearance of slider item in Firefox*/
+#quartile_slider::-moz-range-thumb {
+  -webkit-appearance: none;
+  width: 30px;
+  height: 25px;
+  background: rgba(49,130,189,0.8);
+  cursor: pointer;
+  border: none;
+  border-radius: 10px
+}
+
+
+/*Appeareance when hovering over the slider*/
+#quartile_slider:hover {
+  opacity: 1;
+}
+
+/*-------------------*/
+/*Formating Help Icon*/
+/*-------------------*/
+
+/* Define the icon */
+#help_tip_precon, #help_tip_quartile{
+	margin: auto;
+	text-align: center;
+	border: 2px solid #444;
+	border-radius: 50%;
+	width: 15px;
+	height: 15px;
+	line-height: 15px;
+	cursor: default;
+}
+
+#help_tip_precon:before, #help_tip_quartile:before{
+    content:'?';
+    color:#444;
+
+}
+
+#help_tip_precon:hover, #help_tip_quartile:hover {
+    background-color: #F0F0F0;
+}
+
+#help_tip_precon:hover p, #help_tip_quartile:hover p{
+    display:block;
+    transform-origin: 100% 0%;
+    -webkit-animation: fadeIn 0.3s ease;
+    animation: fadeIn 0.3s ease;
+
+}
+
+/* The tooltip */
+#help_tip_precon p, #help_tip_quartile p {    
+	display: none;
+	background-color: #F2F2F2;
+	padding: 12px 16px;
+	width: 250px;
+	height: auto;
+	position: absolute;
+	left: 50%;
+ 	border: none;
+	line-height: 1.2em;
+	z-index: 99;
+  text-align: left;
+}
+
+/* CSS animation */
+@-webkit-keyframes fadeIn {
+    0% { opacity:0; }
+    100% { opacity:100%; }
+}
+
+@keyframes fadeIn {
+    0% { opacity:0; }
+    100% { opacity:100%; }
+}
+/*-------------------------------------------*/
+/* Position of all the Labels and Help Icons */
+/*-------------------------------------------*/
+#es_results_interactive {
+  position: relative;
+}
+
+#quartile_range {
+  position: relative;
+}
+
+.slider_row {
+  position: absolute;
+}
+
+.sliderlabel {
+  position: absolute; 
+  left: 2.5em;
+} 
+
+#slider_q1 {
+  top: 2.5em;
+}
+
+#slider_q2 {
+  top: 4.8em;
+}
+
+#slider_q3 {
+  top: 7.1em;
+}
+
+#slider_q4 {
+  top: 9.4em;
+}
+
+#slider_clear {
+  top: 11.7em;
+}
+
+#help_tip_precon {
+    position: absolute;
+    top: 0rem;
+    left: 16em;
+}
+
+#help_tip_quartile {
+    position: absolute;
+    top: 0rem;
+    left: 16em;
+}
+
+#help_tip_precon p {
+	transform: translate(5%, 5%);
+    z-index: 99;
+}
+
+#help_tip_quartile p {
+	transform: translate(5%, 5%);
+    z-index: 98;  
+}
+
+    </style>
+</head>
+
+<body>
+
+    <!-- Load d3.js used for creating the figures-->
+    <script src="https://d3js.org/d3.v5.js"></script>
+   
+    <!-- include the jQuery and jQuery UI scripts for slider-->
+    <script src="https://code.jquery.com/jquery-2.1.1.js"></script>
+    <script src="https://code.jquery.com/ui/1.11.1/jquery-ui.js"></script>
+                    
+    <!-- plus a jQuery UI theme, here I use "flick" for slider-->
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.10.4/themes/flick/jquery-ui.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jQuery-ui-Slider-Pips/1.11.4/jquery-ui-slider-pips.js"></script>
+
+<!--------------------------------------
+--Wrapper (around legend and map divs) -
+--------------------------------------->    
+
+ <div class="wrapper">
+
+<!----------------------------------------------------------------------
+--Radio Buttons and info-tooltips for different economic preconditions -
+----------------------------------------------------------------------->
+
+  <div class=radios_preconditions>
+      <p class="choose_precondition">Wählen Sie eine Vorbedingung</p>
+      <p>
+          <label onclick = "expandSlider();setSliderQI();setValueQI();updateData()" class="container1" id="radio_fe1">Grösse des Arbeitsmarktes 
+          <input type="radio" name="radio2" id="radio_fe_es" value="fe">
+          <span class="checkmark_es"></span>
+          </label>
+      </p>   
+      <p>
+          <label onclick = "expandSlider();setSliderQI();setValueQI();updateData()" class="container1" id="radio_phe1">Dichte des Arbeitsmarktes
+          <input type="radio" name="radio2" id="radio_phe_es" value="phe">
+          <span class="checkmark_es"></span>
+          </label>
+      </p>
+      <p>
+          <label onclick = "expandSlider();setSliderQI();setValueQI();updateData()" class="container1" id="radio_hts1">High-Tech-Intensität
+          <input type="radio" name="radio2" id="radio_hts_es" value="hts">
+          <span class="checkmark_es"></span>
+          </label>
+      </p>
+      <p>
+        <label onclick = "setSliderBack();reduceSlider();updateData()" class="container1" id="radio_clear1">Zurücksetzen
+        <input type="radio" name="radio2" id="radio_clear_es" value="empty">
+        <span class="checkmark_es"></span>
+        </label>
+    </p>
+
+    <div id="help_tip_precon">
+        <p> <b> Vorbedingung:</b> Zeigt die regionalökonomischen Vorbedingung einer Gemeinde für Innovationsaktivitäten. Vorbedingungen werden in den Jahren vor der FH-Gründung gemessen und sind somit von den FHs unbeeinflusst. Günstige Vorbedingungen haben das Potenzial, Innovationseffekte der FHs zu verstärken. <br/><br/>
+        </br>
+        <b>Grösse des Arbeitsmarktes:</b> Anzahl Beschäftigte in einer Gemeinde. <br/>
+        <b>Dichte des Arbeitsmarktes:</b> Anzahl Beschäftigte pro Fläche einer Gemeinde.<br/>
+        <b>High-Tech-Intensität:</b> Anteil Beschäftigte in High-Tech Industrien.
+        </p>
+    </div>
+
+  </div>
+
+<!----------------------------------------------
+--Slider to choose between different quartiles--
+----------------------------------------------->
+  <div class="range" id=quartile_range>  
+      <p class="choose_quartile">Wählen Sie die Ausprägung der Vorbedingung</p>
+
+    <!--Labels for the slider-->
+    <div class="slider_row" rowspan = "5">
+    <input type="range" name="quartile_slider" id=quartile_slider min="1" max="5" value="4" step="1" onchange="updateData()">
+    </div>
+    <div class ="sliderlabel" id="slider_q1">tiefste Ausprägung (0%-25%)</div>
+    <div class ="sliderlabel" id="slider_q2">tiefe Ausprägung (25%-50%)</div>
+    <div class ="sliderlabel" id="slider_q3">hohe Ausprägung (50%-75%)</div>
+    <div class ="sliderlabel" id="slider_q4">höchste Ausprägung (75%-100%)</div>
+    <div class ="sliderlabel" id="slider_clear">Zurücksetzen</div>
+
+    <div id="help_tip_quartile">
+        <p>Jeder der <b>vier gleich grossen Gruppen</b> enthält jeweils 25% der Gemeinden. 
+        </br></br>Die Gruppeneinteilung wiederspiegelt die Ausprägung einer Gemeinde bezüglich der jeweiligen Vorbedingung.</p>
+    </div>
+  
+  </div>
+
+<!---------------------------------------
+--Div where the graph will be placed in -
+---------------------------------------->
+  <div id="es_results_interactive"></div>
+</div>
+ 
+<!--------------------------------------------
+--Script for interactive DID coefficientplot--
+--------------------------------------------->
+<script>
+
+
+//---------------------------//
+// Set Values for the figure //
+//---------------------------//
+
+var margin = {top: 20, right: 20, bottom: 60, left: 70};
+var heightValue = 500 - margin.top - margin.bottom;
+var widthValue = 800 - margin.left - margin.right;
+
+//---------------------//
+// Generate SVG Object //
+//---------------------//
+
+// Append an svg object to the body of the page
+var svg = d3.select("#es_results_interactive")
+.append("svg")
+// Defines the size of the svg elements View Box
+.attr("viewBox", "0 0 800 500")
+// Creates an SVG group element which is used to group SVG (scalable vector graphics) shapes together
+.append("g")
+//Used to transform the SVG group elemnts:
+//Translate therby shifts the grouped elements along the x or y axis (dx dy)
+//One could also rotate the grouped elements, .e.g, rotate(-90 180 180) where the first number indicates the angle and the others the point around which the g elemnt is rotated
+  .attr("transform",
+        "translate(" + margin.left + "," + margin.top + ")");
+   
+//----------//
+// Add Axes //
+//----------//  
+ 
+// Make a linear scale for the x-axis
+var xScale = d3.scaleLinear()
+  .domain([-9,11])
+  .range([0, widthValue])
+// Make an axis generator
+var xAxisGenerator = d3.axisBottom(xScale)
+// Customize tick labels
+var tickLabels = [ "","<= -8", "-7", "-6", "-5", "-4", "-3", "-2", "-1", "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", ">=10"];
+xAxisGenerator.ticks(21)
+xAxisGenerator.tickFormat((d,i) => tickLabels[i]);
+// Render the axis with .call
+var xAxis = svg.append("g")
+              .call(xAxisGenerator)
+              // Translating the axis to the bottom of the visualization
+xAxis.attr("transform", "translate(0," + heightValue + ")")
+     .attr("class", "line")
+// Formating the Text of the axis
+.selectAll("text")
+  .style("text-anchor", "middle");
+               
+// Make a linear scale for the y-axis
+var yScale = d3.scaleLinear()
+    .domain([-30, 40])
+    .range([ heightValue, 0 ]);
+  // Make an axis generator
+var yAxisGenerator = d3.axisLeft(yScale)
+// Define Space between Ticks and Labels
+yAxisGenerator.tickPadding(25)
+// Make a grid for the y-axis
+yAxisGenerator.tickSize(-700)
+// Render the axis with .call
+var yAxis = svg.append("g")
+              .call(yAxisGenerator)
+// Translating the axis to the bottom of the visualization
+yAxis.attr("transform", "translate(0," - widthValue + ")")
+.attr("class", "line")
+// Formating the Text of the axis
+.selectAll("text")
+  .style("text-anchor", "middle");
+// Formating the grid
+yAxis.selectAll(".tick line")
+.attr("stroke", "gray")
+.attr("stroke-width", "0.2");
+
+//------------------//
+// Draw zero y line //
+//------------------//
+
+svg.append("line")
+  .style("stroke", "black")
+  .style("stroke-width", 1)
+  .attr("x1", xScale(-9))
+  .attr("y1", yScale(0))
+  .attr("x2", xScale(11))
+  .attr("y2", yScale(0));    
+
+//---------------------------------------------------------//
+// Draw lines for UASs and first graduates on labor market //
+//---------------------------------------------------------//
+  
+svg.append("line")
+  .style("stroke", "#606060")
+  .style("stroke-width", "1")
+  .attr("x1", xScale(3))
+  .attr("y1", yScale(-30))
+  .attr("x2", xScale(3))
+  .attr("y2", yScale(40));
+  
+  svg.append("line")
+  .style("stroke", "#606060")
+  .style("stroke-width", "1")
+  .attr("x1", xScale(0))
+  .attr("y1", yScale(-30))
+  .attr("x2", xScale(0))
+  .attr("y2", yScale(40));
+  
+  // Manually draw x-line because it is otherwise overwritten by update
+  svg.append("line")
+  .style("stroke", "#606060")
+  .style("stroke-width", "2")
+  .attr("x1", xScale(-9))
+  .attr("y1", yScale(-30))
+  .attr("x2", xScale(11))
+  .attr("y2", yScale(-30));  
+
+  // Manually draw y-line because it is otherwise overwritten by update
+  svg.append("line")
+  .style("stroke", "#606060")
+  .style("stroke-width", "2")
+  .attr("x1", xScale(-9))
+  .attr("y1", yScale(-30))
+  .attr("x2", xScale(-9))
+  .attr("y2", yScale(40));  
+
+//---------------//
+// y- Axis Title //
+//---------------//
+
+svg.append("text")
+  .attr("class", "y label")
+  .attr("text-anchor", "middle")
+  .attr("x", -190)
+  .attr("y", -55)
+  .attr("transform", "rotate(-90)")
+  .text("Innovationseffekte der FH-Gründung (in %)")
+    .style("font", "1rem Arial, Helvetica, sans-serif, sans-serif")
+    .style("fill", "black");
+
+//---------------//
+// x- Axis Title //
+//---------------//
+
+svg.append("text")
+  .attr("class", "x label")
+  .attr("text-anchor", "middle")
+  .attr("x", +350)
+  .attr("y", +50)
+  .attr("transform", "translate(0," + heightValue + ")")
+  .text("Jahre vor bzw. nach der FH-Gründung")
+    .style("fill", "black");
+
+//-----------------------------------//
+// Text indicating UAS establishment //
+//-----------------------------------//
+
+svg.append("text")
+.attr("class", "x label")
+.attr("text-anchor", "middle")
+.attr("x", widthValue - 420)
+.attr("y", heightValue - 425)
+.text("FH-Gründung")
+  .style("fill", "#606060");
+
+svg.append("text")
+.attr("class", "x label")
+.attr("text-anchor", "left")
+.attr("x", widthValue - 320)
+.attr("y", heightValue - 425)
+.text("Erste FH-Abolvierende auf dem Arbeitsmarkt")
+  .style("fill", "#606060");
+
+//----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+// Graph update function regarding Economic Precondition and chosen Quartiles //
+//----------------------------------------------------------------------------// 
+//----------------------------------------------------------------------------//
+
+// Set counter to identify initialization of graph
+
+let counter = 0;
+
+// Create update function for changes in the economic precondition.
+function updateData() {
+
+// Get selected economic precondition
+if(document.getElementById("radio_fe_es").checked) {   
+        var selectedMeasure = document.getElementById("radio_fe_es").value   
+} else if(document.getElementById('radio_phe_es').checked) {   
+        var selectedMeasure = document.getElementById("radio_phe_es").value   
+} else if(document.getElementById('radio_hts_es').checked) {   
+    var selectedMeasure = document.getElementById("radio_hts_es").value            
+} else if(document.getElementById("radio_clear_es").checked) {
+    var selectedMeasure = document.getElementById("radio_clear_es").value
+}
+
+// ---------------------//
+// Extract slider value //
+// ---------------------//
+
+var selectedQuartile = document.getElementById("quartile_slider").value
+
+// ------------------------------//
+// Define different transitions //
+// -----------------------------//
+
+// Identifier for either first transition or transition after "clear all"
+counter += 1;
+var svgSizeLine = svg.selectAll(".line1").size()
+
+// Defines speed of transition: immediate if first transition of after "clear all", slow transition if change in figure.
+if (counter !=1 & svgSizeLine !=0) {
+    var t = 300
+} else if(counter == 1) {
+    var t = 0
+}
+// ------------//
+// Import Data //
+// ------------//
+
+
+d3.csv("https://raw.githubusercontent.com/schlegeltobias/maps_switzerland/main/data_es_"+selectedMeasure+".csv")
+.then(function(data) {
+
+data.forEach(function(d) {
+    d.period = +d.period;
+    d.quartile = +d.quartile;
+    d.effect = +d.effect;
+    d.lb = +d.lb;
+    d.ub = +d.ub;  
+});
+
+// Update confidence intervalls depending on quartile choice   
+var CI = svg.selectAll(".line1")
+  .data(data.filter(function(d){return d.quartile == selectedQuartile}))
+CI
+.enter()
+  .append("line")
+  .attr("class", "line1")
+  .style("stroke", "rgba(49,130,189,0.6)")
+  .style("stroke-width", 10)
+  .style("stroke-linecap", "round")
+  .merge(CI)
+  .transition()
+    .duration(t)
+  .attr("x1", function (d) { return xScale(d.period);})
+  .attr("y1", function (d) { return yScale(d.lb);})
+  .attr("x2", function (d) { return xScale(d.period);})
+  .attr("y2", function (d) { return yScale(d.ub);});
+
+
+// Update line connecting coefficients    
+line = svg.selectAll("path")
+.datum(data.filter(function(d){return d.quartile == selectedQuartile}))
+
+line
+.enter()
+.append("path1")
+.attr("class", "path1")
+.attr("stroke", "rgba(158,202,225,0.6)")
+.style("stroke-width", 10)
+.merge(line)
+.transition()
+  .duration(t)
+.attr("d", d3.line()
+.x(function(d) { return xScale(d.period) })
+.y(function(d) { return yScale(d.effect) })
+)
+.attr("stroke", "rgba(49,130,189,0.6)")
+.attr("stroke-width", 5)
+
+// Update coefficients depending on quartile choice
+var dots = svg.selectAll(".circle1")
+.data(data.filter(function(d){return d.quartile == selectedQuartile}))
+
+dots
+.enter()
+.append("circle")
+.attr("class", "circle1")
+.merge(dots)
+.on("mouseover", mouseover)
+.on("mouseout", mouseout)
+.transition()
+  .duration(t)
+.attr("cx", function (d) { return xScale(d.period);})
+.attr("cy", function (d) { return yScale(d.effect);})
+.attr("r", 10)
+.style("fill", "rgba(49,130,189)")
+
+//--------------------------------//
+// Clear figure if no data chosen //
+//--------------------------------//
+
+var selectedQuartileEmpty = document.getElementById("quartile_slider").value
+var selectedMeasureEmpty = document.getElementById("radio_clear_es").checked
+
+if(selectedMeasureEmpty = true || selectedQuartileEmpty==5) {
+CI.exit().remove()
+line.exit().remove()
+dots.exit().remove()
+}
+
+})
+
+}
+
+//-----------------------------------------------------------------//
+// Alter slider depending on what economic precondition is checked //
+//-----------------------------------------------------------------//
+
+// Function sets back slider value to clear all when "clear all" (in economic preconditions) is checked
+function setSliderBack() {
+  document.getElementById("quartile_slider").value = "5";
+  selectedValue = 5
+}
+// Function disables slider when "Clear all" (in economic preconditions) is checked
+function reduceSlider() {
+  document.getElementById("quartile_slider").disabled = true;
+}
+
+// Function enables slider again when another economic preconditions besides "clear all" is checked
+function expandSlider() {
+  document.getElementById("quartile_slider").disabled = false;
+}
+
+// Set slider to QI if it was "clear all" before
+function setSliderQI() {
+  if (document.getElementById("quartile_slider").value == "5") {selectedValue = 4}
+}
+
+// Set slider to QI if it was "clear all" before
+function setValueQI() {
+  if (document.getElementById("quartile_slider").value == "5") {document.getElementById("quartile_slider").value = "4"}
+}
+
+//-----------------------------------------------------------------//
+// Alter slider depending on what economic precondition is checked //
+//-----------------------------------------------------------------//
+
+// Function sets back slider value to clear all when "clear all" (in economic preconditions) is checked
+function setSliderBack() {
+  document.getElementById("quartile_slider").value = "5";
+  selectedValue = 5
+}
+// Function disables slider when "Clear all" (in economic preconditions) is checked
+function reduceSlider() {
+  document.getElementById("quartile_slider").disabled = true;
+}
+
+// Function enables slider again when another economic preconditions besides "clear all" is checked
+function expandSlider() {
+  document.getElementById("quartile_slider").disabled = false;
+
+}
+
+// Set slider to QI if it was "clear all" before
+function setSliderQI() {
+  if (document.getElementById("quartile_slider").value == "5") {selectedValue = 4}
+}
+
+// Set slider to QI if it was "clear all" before
+function setValueQI() {
+  if (document.getElementById("quartile_slider").value == "5") {document.getElementById("quartile_slider").value = "4"}
+}
+
+// ---------------------------------------//
+// Tooltips providing further information //
+// ---------------------------------------//
+      
+var tooltip_es = d3.select("body").append("div")
+.attr("class", "mytooltip")
+.style("opacity", 0)
+.style("color", "rgb(49,130,189)")
+
+// ------------------------------------------//
+// Show Tooltip when mouse is on coefficient //
+// ------------------------------------------//
+var mouseover =  function(d) {
+  // Defines Coefficient Value and its format
+    var periode = d3.format(".0f")(d.period);
+    if (periode >= 0) {
+        var periode_text = periode
+    }
+    else {
+        var periode_text = periode*(-1)
+    }
+    var effectSize = d3.format(".1f")(d.effect);
+    if (effectSize >=0) {
+      var effectSizeValue = effectSize
+    } else {
+      var effectSizeValue = effectSize*(-1)
+    }
+    // Defines style of the tooltip    
+    tooltip_es.transition()
+    .duration(0)
+    .style("opacity", 1)
+    // Fills the tooltip
+    if (periode >=0){
+        if (effectSize >=0) {
+            tooltip_es.html("Relativ zur letzten Periode vor der FH-Gründung hat eine Gemeinde in der Treatment-Gruppe "  + periode_text + " Jahr(e) nach der FH-Gründung eine um " + effectSizeValue +"% höhere Innovationsaktivität als eine Gemeinde aus demselben Quartil, die sich in der Kontroll-Gruppe befindet.")
+            .style("left", (d3.event.pageX+10) + "px")
+            .style("top", (d3.event.pageY+10) + "px")
+        }
+        else {
+            tooltip_es.html("Relativ zur letzten Periode vor der FH-Gründung hat eine Gemeinde in der Treatment-Gruppe "  + periode_text + " Jahr(e) nach der FH-Gründung eine um " + effectSizeValue +"% tiefere Innovationsaktivität als eine Gemeinde aus demselben Quartil, die sich in der Kontroll-Gruppe befindet.")
+            .style("left", (d3.event.pageX+10) + "px")
+            .style("top", (d3.event.pageY+10) + "px")
+        }
+}
+    else if (periode <-1){
+        if (effectSize >=0) {
+            tooltip_es.html("Relativ zur letzten Periode vor der FH-Gründung hat eine Gemeinde in der Treatment-Gruppe "  + periode_text + " Jahr(e) vor der FH-Gründung eine um " + effectSizeValue +"% höhere Innovationsaktivität als eine Gemeinde aus demselben Quartil, die sich in der Kontroll-Gruppe befindet.")
+            .style("left", (d3.event.pageX+10) + "px")
+            .style("top", (d3.event.pageY+10) + "px")
+        }
+        else {
+            tooltip_es.html("Relativ zur letzten Periode vor der FH-Gründung hat eine Gemeinde in der Treatment-Gruppe "  + periode_text + " Jahr(e) vor der FH-Gründung eine um " + effectSizeValue +"% tiefere Innovationsaktivität als eine Gemeinde aus demselben Quartil, die sich in der Kontroll-Gruppe befindet.")
+            .style("left", (d3.event.pageX+10) + "px")
+            .style("top", (d3.event.pageY+10) + "px")
+        }
+    }
+    else {
+        tooltip_es.html("Referenzjahr")
+            .style("left", (d3.event.pageX+10) + "px")
+            .style("top", (d3.event.pageY+10) + "px")
+        }
+}
+
+var mouseout = function(d) {
+  tooltip_es
+  .transition()
+  .duration(0)
+  .style("opacity", 0)
+}
+
+
+
+
+
+
+
+//------------------//
+// Initialize Graph //
+//------------------//
+
+// Initial Value is Labor Market Size and Quartile 4
+document.getElementById("radio_fe_es").checked = true;
+selectedMeasure = "fe"
+selectedQuartile = 4
+updateData()
+
+</script>
+
+</body>
+</html>

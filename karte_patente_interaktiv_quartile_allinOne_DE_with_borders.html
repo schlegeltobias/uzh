@@ -1,0 +1,895 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Karte Innovationsmasse</title>
+<style>
+
+/*----------------*/
+/*Layout the grid-*/
+/*----------------*/
+
+.wrapper {
+    display: grid;
+    grid-gap: 1em;
+    grid-template-rows: repeat(auto-fill, 20em);
+    grid-template-columns: repeat(auto-fill, 19em);
+  }
+
+#map_switzerland{
+    grid-column: 1 / -1;
+}
+
+  @media screen and (min-width: 1200px) {
+    #map_switzerland {
+      grid-column: 1 / -1;
+
+    }
+  
+  }
+
+  /*----*/
+  /*Font*/
+  /*----*/
+  body {
+    font-family: Arial, Helvetica, sans-serif, sans-serif;
+  }
+    
+  /*--------------------/*
+  /*Formating Checkboxes/*
+  /*--------------------/*
+  
+  /* Customize the label (the container2) */
+  .container2 {
+      display: block;
+      position: relative;
+      padding-left: 35px;
+      margin-bottom: 12px;
+      cursor: pointer;
+      -webkit-user-select: none;
+      -moz-user-select: none;
+      -ms-user-select: none;
+      user-select: none;
+  
+    }
+    
+    /* Hide the browser's default radio button */
+    .container2 input {
+      position: absolute;
+      opacity: 0;
+      cursor: pointer;
+      height: 0;
+      width: 0;
+    }
+    
+    /* Create a custom radio button */
+    .checkmark {
+      position: absolute;
+      top: 0;
+      left: 0;
+      height: 25px;
+      width: 25px;
+      background-color: #eee;
+      border-radius: 50%;
+    }
+    
+    /* On mouse-over, add a grey background color */
+    .container2:hover input ~ .checkmark {
+      background-color: #ccc;
+    }
+    
+    /* When the radio button is checked, add a blue background */
+    .container2 input:checked ~ .checkmark {
+      background-color: #238443;
+    }
+    
+    /* Create the indicator (the dot/circle - hidden when not checked) */
+    .checkmark:after {
+      content: "";
+      position: absolute;
+      display: none;
+    }
+    
+    /* Show the indicator (dot/circle) when checked */
+    .container2 input:checked ~ .checkmark:after {
+      display: block;
+    }
+    
+    /* Style the indicator (dot/circle) */
+    .container2 .checkmark:after {
+      top: 7.5px;
+      left: 7.5px;
+      bottom: 7.5px;
+      right: 7.5px;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: white;
+    }
+  
+    .choose_measure, #legend_pre_post, .title_quartile, .title_fh  {
+      font-weight: 700;
+    }
+
+  
+  /*------------------*/
+  /*Formating Tooltips*/
+  /*------------------*/
+  
+    div.mytooltip {
+      position: absolute;
+      text-align: center;
+      padding: .5rem;
+      background-color: #F2F2F2;
+      border: none;
+      pointer-events: none; 
+      white-space: pre-line;
+      font-family: Arial, Helvetica, sans-serif, sans-serif;
+    }
+  
+  
+  /*-------------------*/
+  /*Formating Help Icon*/
+  /*-------------------*/
+  
+  div.help_tooptip_year {
+    position: absolute;
+    text-align: center;
+    padding: .5rem;
+    background: #FFFFFF;
+    color: #313639;
+    border: 0.5px solid gray; 
+    border-radius: 8px;
+    pointer-events: none; 
+    white-space: pre-line;
+    font-family: Arial, Helvetica, sans-serif, sans-serif;
+  }
+
+  /* Define the icon */
+  .help-tip{
+      position: relative;
+      margin: auto;
+      text-align: center;
+      border: 2px solid #444;
+      border-radius: 50%;
+      width: 20px;
+      height: 20px;
+      line-height: 20px;
+      cursor: default;
+ }
+  
+  .help-tip:before{
+      content:'?';
+      color:#444;
+  
+  }
+  
+  .help-tip:hover {
+      background-color: #F0F0F0;
+  }
+  
+  .help-tip:hover p{
+      display:block;
+      transform-origin: 100% 0%;
+      -webkit-animation: fadeIn 0.3s ease;
+      animation: fadeIn 0.3s ease;
+  
+  }
+  
+  /* The tooltip */
+  .help-tip p {    
+      display: none;
+      background-color: #F0F0F0;
+      padding: 12px 16px;
+      width: 250px;
+      height: auto;
+      position: absolute;
+      left: 50%;
+      transform: translate(10%, -75%);
+      color: #37393D;
+      line-height: 1.2em;
+      z-index: 101;
+      font-size: 1em;
+      text-align: left;
+
+  }
+  
+  /* CSS animation */
+  @-webkit-keyframes fadeIn {
+      0% { opacity:0; }
+      100% { opacity:100%; }
+  }
+  
+  @keyframes fadeIn {
+      0% { opacity:0; }
+      100% { opacity:100%; }
+  }
+  
+/*--------------------------------*/
+/* Position of all the Help Icons */
+/*--------------------------------*/
+
+#legend_innovation,  #legend_pre_post, #legend_quartile, #legend_UAS  {
+    position: relative;
+}
+
+#legen_pre_post_title {
+    margin-top: 3em;
+}
+
+
+#time_slider_div {
+    position: absolute;
+    z-index: 50;
+    left: -1.1em;
+    top: 1em;
+}
+
+#time_before, #time_after, #help_tip_pre_post {
+position: absolute;
+font-weight: normal;
+color: black;
+left: 2em;
+}
+
+#time_before {
+top: 0.5em; 
+}
+
+#time_after {
+top: 3em; 
+}
+
+#help_tip_pats {
+position: absolute;
+top: 1em;
+left: 17em;
+z-index: 99;
+}
+
+#help_tip_pre_post {
+position: absolute;
+top: 1em;
+left: 14.5em;
+z-index: 98;
+}
+
+#help_tip_quartile {
+position: absolute;
+top: 1em;
+left: 15em;
+z-index: 97;
+}
+
+#help_tip_UAS {
+position: absolute;
+top: 1em;
+left: 9em;
+z-index: 96;
+}
+
+#help_tip_pats p {
+    transform: translate(-20%, 20%);
+}
+    
+#help_tip_UAS p {
+    transform: translate(-70%, 17%);
+}
+
+#help_tip_pre_post p {
+    transform: translate(-70%, 30%);
+
+}
+
+/*-----------------*/
+/*Formating Slider */
+/*-----------------*/
+
+/*Appearance of slider band */
+#time_slider {
+  transform: rotate(90deg);
+ -webkit-appearance: none;
+  appearance: none;
+  width: 65px;
+  height: 25px;
+  background: rgba(230,230,230,0.5);
+  outline: none;
+  opacity: 0.7;
+  -webkit-transition: .2s;
+  transition: opacity .2s;
+  border-radius: 10px;
+  border: none;
+  margin-top: 25px;
+  margin-left:0px;
+  margin-right:0px;
+  z-index: 20;
+  }
+  /*Creates vertical slider*/
+
+
+/*Appearance of slider item*/
+#time_slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 30px;
+  height: 25px;
+  background: #238443;
+  cursor: pointer;
+  border: none;
+  border-radius: 10px;
+  z-index: 20;
+}
+
+/*Appearance of slider item in Firefox*/
+#time_slider::-moz-range-thumb {
+  -webkit-appearance: none;
+  width: 30px;
+  height: 25px;
+  background: #238443;
+  cursor: pointer;
+  border: none;
+  border-radius: 10px
+}
+
+
+/*Appeareance when hovering over the slider*/
+#time_slider:hover {
+  opacity: 1;
+}
+
+
+.label_table tr { 
+    line-height: 40px;
+    border: none;
+}
+
+
+
+</style>
+
+
+</head>
+
+    <script src="https://d3js.org/d3.v4.min.js"></script>
+    <script src="//d3js.org/topojson.v1.min.js"></script>
+    <!-- Color Scheme-->
+    <script src="https://d3js.org/colorbrewer.v1.min.js"></script>
+
+<body>
+
+<!--------------------------------------
+--Wrapper (around legend and map divs) -
+--------------------------------------->
+
+<div class="wrapper">
+
+<!-------------------------------------------------------------------------------
+--Radio Buttons and slider with info-tooltips for different innovation measures -
+--------------------------------------------------------------------------------->
+
+<div id="legend_innovation">
+    <p class="choose_measure">1. Wählen Sie ein Innovationsmass</p>
+    <p>
+        <label class="container2"onclick=" updateInno()" >Anzahl Patentanmeldungen
+        <input class=radio2 id="radio_pats" type="radio" value="pats" name="radio" checked="checked">
+        <span class="checkmark"></span>
+        </label>
+    </p>
+    <p>
+        <label class="container2" onclick=" updateInno()" >Anzahl genehmigter Patente
+        <input class= radio2 id="radio_grants" type="radio" value="grants" name="radio">
+        <span class="checkmark"></span>
+        </label>
+    </p>
+    <p>
+        <label class="container2" onclick=" updateInno()" >Patentierte Ansprüche pro Patent
+        <input class=radio2 id="radio_claims" type="radio" value="claims" name="radio">
+        <span class="checkmark"></span>
+        </label>
+    </p>
+    <p>
+        <label class="container2" onclick=" updateInno()" >Grösse der Patentfamilie
+        <input class= radio2 id="radio_fam" type="radio" value="fam" name="radio">
+        <span class="checkmark"></span>
+        </label>
+    </p>
+
+    <div id=legend_pre_post>  
+        <p id="legen_pre_post_title">2. Wählen Sie einen Zeitpunkt</p>
+            <div id=time_slider_div>
+        <input type="range" name="time_slider" id=time_slider min="1" max="2" step="1" onclick= "updateInno()" onchange ="updateInno()">
+        </div>
+        <div id=time_before>
+            <p>Vor der FH-Gründung</p>
+        </div>
+        <div id=time_after>
+            <p>Nach der FH-Gründung</p>
+        </div>
+        <div class="help-tip" id="help_tip_pre_post">
+            <p>Für Gemeinden <b>ausserhalb der FH-Region</b> werden die Jahre vor 1997 zur Zeit vor der FH-Gründung gezählt und alle Jahre danach zur Zeit nach der FH-Gründung. 
+            </br></br>
+                Bei den Gemeinden <b>innerhalb der FH-Region</b> werden für die Zuteilung die Tatsächlichen Gründungsjahre der jeweiligen FH verwendet.
+            </p>
+        </div>
+    </div>
+
+    <div class="help-tip" id="help_tip_pats">
+        <p>Zur Auswahl stehen vier Innovationsmasse: 
+        </br></br>
+        Die <b>Anzahl Patentanmeldungen</b> in einer Gemeinde pro Jahr ist ein Quantitäsindikator.
+        </br></br>
+        Die <b>Anzahl genehmigter Patente</b> in einer Gemeinde pro Jahr ist ein Quantitätsindikator.
+        </br></br>
+        Die <b>Grösse der Patentfamilie</b> in einer Gemeinde pro Jahr ist ein Qualitätsindikator. Sie misst, in wie vielen Ländern die Erfindungen eines Patents patentiert wurden.
+        </br></br>
+        Die <b>Anzahl Ansprüche pro Patent</b> in einer Gemeinde pro Jahr ist ein Qualitätsindikator. Sie zeigt, wie viele Teilerfindungen von einem erteilten Patent abgedeckt werden.</p>
+    </div> 
+</div>
+
+
+<!---------------------------------------------------------
+--Legend and info-tooltips for innovation measure classes -
+---------------------------------------------------------->
+<div id="legend_quartile">
+    <p class="title_quartile">Ausprägung Innovationsmass</p>
+    <div class="help-tip" id="help_tip_quartile">
+        <p>Die vier Farben stehen für <b>vier Gruppen</b>. Die unteren beiden Gruppen enthalten je 40% der Gemeinden, die beiden oberen je 10% (wegen ungleicher Verteilung). 
+        </br></br>Die Gruppeneinteilung wiederspiegelt die Ausprägung einer Gemeinde bezüglich des jeweiligen Innovationsmasses.</p>
+    </div>
+</div>
+
+
+<!-------------------------------------------
+--Legend and info-tooltips for UAS campuses -
+-------------------------------------------->
+
+
+<div id="legend_UAS">
+    <p class="title_fh">Fachhochschulen</p>
+    <div class="help-tip" id="help_tip_UAS">
+        <p><b>FH-Standorte:</b> Campus an dem MINT-Fächer unterrichtet werden. Eine FH kann dabei aus mehreren Standorten bestehen.
+        </br></br>
+        <b>FH-Regionen:</b> Alle Gemeinden im Umkreis von 25 Kilometern um einen FH-Standort.
+        </br></br>
+        <b>FH-Gründungsjahr</b> (Maus auf FH-Standort bewegen): Entspricht entweder dem Jahr an dem ein FH-Standort neu eröffnet wurde oder an dem eine Vorgängerinstitution offiziell zu einer FH wurde (Genehmigung durch Bundesrat).
+        </p>    
+    </div>
+    
+</div>
+
+<!-------------------------------------
+--Div where the map will be placed in -
+-------------------------------------->
+<div id="map_switzerland"></div>
+</div>
+
+
+<script>
+
+
+// Width, height and margins
+var margin = {top: 0, right: 300, bottom: 0, left: 0 };
+var heightValue = 400 - margin.top - margin.bottom;
+var widthValue = 1000 - margin.left - margin.right;
+
+//Defin the projection method, and its translation and scale
+var projection = d3.geoMercator()
+					.scale([7500])
+					.center([8.5,46.8])
+					.translate([widthValue/2, heightValue/2])
+
+//Define path generator, using the Albers USA projection
+var path = d3.geoPath()
+				.projection(projection);
+
+//Create SVG element
+var svg = d3.select("#map_switzerland")
+			.append("svg")
+			.attr("viewBox", "0 0 650 400")
+            .attr("transform",
+            "translate(" + margin.left + "," + margin.top + ")");
+
+// Bind svg elemnt to a group            
+var layer1 = svg.append("g");
+var layer2 = svg.append("g");
+var layer3 = svg.append("g");
+var layer4 = svg.append("g");
+
+
+// Define Color for UASs 
+color_border = "#252525"
+
+//--------//
+// Legend //
+//--------//
+
+var margin_legend = {top: 0, right: 0, bottom: 0, left: 0};
+
+//Create SVG element for UAS establishment year legend
+var svg_legend_UAS = d3.select("#legend_UAS")
+			.append("svg")
+            // .attr("height", 220)
+			.attr("transform",
+             "translate(" + margin_legend.left + "," + margin_legend.top + ")");
+
+
+//FH-Gründungsjahr
+svg_legend_UAS.append("circle").attr("cx", 13).attr("cy",13).attr("r", 12).style("fill", color_border).style("stroke", "#000000").style("stroke-width", 0.8)
+svg_legend_UAS.append("text").attr("x", 37).attr("y", 15).text("FH-Standort").style("dominant-baseline", "middle")
+
+//FH-Region
+svg_legend_UAS.append('line')
+  .attr("x1",0).attr("y1",50).attr("x2",25).attr("y2",50)
+  .style("stroke", color_border)
+  .style("stroke-width", 4)
+  .style("stroke-opacity", 0.8)
+
+// svg_legend_UAS.append("circle").attr("cx", 20).attr("cy",75).attr("r", 10).style("fill", '#d95f02').style("stroke", "#404040").style("stroke-width", 0.8)
+svg_legend_UAS.append("text").attr("x", 37).attr("y", 50).text("FH-Regionen").style("dominant-baseline", "middle")
+
+
+//Create SVG element for quartile legend
+var svg_legend_quartile = d3.select("#legend_quartile")
+			.append("svg")
+            .attr("height", 170)
+			.attr("transform",
+            "translate(" + margin_legend.left + "," + margin_legend.top + ")");
+
+// TG Rectangles
+svg_legend_quartile.append("rect").attr("x", 0).attr("y", 0).attr("width", 20).attr("height", 60).style("fill", '#ffffcc')
+svg_legend_quartile.append("rect").attr("x", 0).attr("y", 60).attr("width", 20).attr("height", 60).style("fill", '#c2e699')
+svg_legend_quartile.append("rect").attr("x", 0).attr("y", 120).attr("width", 20).attr("height", 20).style("fill", '#78c679')
+svg_legend_quartile.append("rect").attr("x", 0).attr("y", 140).attr("width", 20).attr("height", 20).style("fill", '#238443')
+
+// Quartile Text
+svg_legend_quartile.append("text").attr("class", "border1").attr("x", 35).attr("y", 35).text("tiefste Ausprägung (0%-40%)")
+svg_legend_quartile.append("text").attr("class", "border2").attr("x", 35).attr("y", 95).text("tiefe Ausprägung (40%-80%)")
+svg_legend_quartile.append("text").attr("class", "border3").attr("x", 35).attr("y", 135).text("hohe Ausprägung (80%-90%)")
+svg_legend_quartile.append("text").attr("class", "border4").attr("x", 35).attr("y", 155).text("höchste Ausprägung (90%-100%)")
+
+
+//Load in TopoJSON data for lakes
+//Datasource https://swiss-maps.vercel.app/ (using WGS 84 coordinates and only including lakes)
+//Since only downloadable as a topojson, it must be included somewhat differently than the other data
+d3.json("https://raw.githubusercontent.com/schlegeltobias/maps_switzerland/main/swiss-maps_lakes.json", function(error, json) {
+    layer1.append("path")
+        .datum(topojson.feature(json, json.objects.lakes))
+        .attr("class", "path_lake")
+        .attr("d", path)
+        .style("fill", "#ADD8E6")
+        .style("stroke-width", 0)
+        .style("stroke", "#A7C7E7")
+})
+
+function updateInno() {
+    // Find selected innovation measure    
+    if(document.getElementById('radio_pats').checked) {   
+            var selectedMeasure = document.getElementById("radio_pats").value   
+    } else if(document.getElementById('radio_grants').checked) {   
+            var selectedMeasure = document.getElementById("radio_grants").value   
+    } else if(document.getElementById('radio_claims').checked) {   
+        var selectedMeasure = document.getElementById("radio_claims").value            
+    } else if(document.getElementById('radio_fam').checked) {   
+        var selectedMeasure = document.getElementById("radio_fam").value            
+    } else if(document.getElementById('radio_grants').checked) {   
+        var selectedMeasure = document.getElementById("radio_grants").value
+    } else {   
+        document.getElementById("error").innerHTML   
+            var selectedMeasure = pats;   
+    }
+
+
+// Find selected TimePeriod
+var selectedTimePeriod = document.getElementById("time_slider").value-1
+
+d3.csv("https://raw.githubusercontent.com/schlegeltobias/maps_switzerland/main/data_"+selectedMeasure+selectedTimePeriod+".csv", function(data) {
+
+// Define parameters of the transition (fast or slow transition)
+var t = d3.transition()
+        .duration(750)
+
+
+var measure = data.map(d => Number(d.measure))
+var measure_av = data.map(d => Number(d.measure_av))
+var min = Math.min.apply(null, measure_av);
+var min = d3.format(".1f")(min)
+var g1 = d3.quantile(measure_av.sort(d3.ascending),0.40)
+var g1 = d3.format(".1f")(g1)
+var g2 = d3.quantile(measure_av.sort(d3.ascending),0.80)
+var g2 = d3.format(".1f")(g2)
+var g3 = d3.quantile(measure_av.sort(d3.ascending),0.90)
+var g3 = d3.format(".0f")(g3)
+var max = Math.max.apply(null, measure_av)
+var max = d3.format(".0f")(max);
+
+// Use colors from https://colorbrewer2.org/
+
+var scale = d3.scaleQuantile(measure)
+            .range(colorbrewer.YlGn[4])
+            .domain([min, g1, g2, g3, max]);
+
+//Load in GeoJSON data for municipalities
+    d3.json("https://raw.githubusercontent.com/schlegeltobias/maps_switzerland/main/g1g18_lonlat.json", function(json) {
+	// Merge the two data files
+	// Loop through municipalities in quartile dataset
+    for (var i = 0; i < data.length; i++) {
+	// Grab Municipality's innovation measure
+		var dataMunicipality = data[i].GMDENR_2018;
+		// Grab quartile 
+        var dataValue = data[i].measure
+		// Grab Treatment Status
+		var T_25 = data[i].T_25
+	// Loop through municipalities in geojson
+	for (var j = 0; j < json.features.length; j++) {
+		var jsonMunicipality = json.features[j].properties.GMDNR;
+	// Copy the data on quartiles and treatment status into the JSON for municipalities that match
+	if (dataMunicipality == jsonMunicipality) {
+		json.features[j].properties.value = dataValue
+		json.features[j].properties.T_25 = T_25
+		break;
+			}
+		}
+}
+
+//Bind data and create one path per GeoJSON feature
+var paths = layer2.selectAll(".path_mun")
+                .data(json.features)
+paths
+    .enter()
+        .append("path")
+        .attr("class", "path_mun")
+    .merge(paths)
+    .transition(t)
+            .attr("d", path)
+    .style("stroke-width", 0.2)
+    .style("stroke", "#d3d3d3")
+    .style("fill", function(d) {
+        var value = d.properties.value;
+        if (typeof value != "undefined"){
+            return scale(value);
+        } else {
+            return "#ffffcc"
+        }
+    })
+    })
+
+//---------------//
+// Update Legend //
+//---------------//
+
+// d3.select("text.border1").text(min+" - "+g1)
+// d3.select("text.border2").text(g1+" - "+g2)
+// d3.select("text.border3").text(g2+" - "+g3)
+// d3.select("text.border4").text(g3+" - "+max)
+
+});
+}
+
+//-------------------------//
+// UAS establishment Years //
+//-------------------------//
+
+d3.csv("https://raw.githubusercontent.com/schlegeltobias/maps_switzerland/main/Generalisierte_Gemeindegrenzen_Schweiz_FH_Gemeinden.csv", function(data_mun) {
+
+        //---------//
+        // Tooltip //
+        //---------//
+
+        var t_tooltip = d3.transition()
+        .duration(500)
+        
+        // Municipality Name and Establishment Year
+        var tooltip_UAS = d3.select("body").append("div")
+        .attr("class", "mytooltip")
+        .style("opacity", 0)
+        .style("color", color_border)
+
+        var mouseover_UAS =  function(d) { 
+        // Defines Coefficient Value and its format
+            var UAS_mun = d.GMDNAME
+            var UAS_begin =d.begin
+            // Defines style of the tooltip    
+            tooltip_UAS.transition(t_tooltip)
+            .duration(0)
+            .style("opacity", 1)
+            // Fills the tooltip
+            tooltip_UAS.html("<p align=left><b>FH-Standort</b>: " + UAS_mun +"</p> " +"<p align=left><b>FH-Gründungsjahr</b>: " + UAS_begin +"</p>")
+            .style("left", (d3.event.pageX+10) + "px")
+            .style("top", (d3.event.pageY+10) + "px")
+        // Change circle when mouseover
+        d3.select(this)
+        .transition()
+        .duration(200)
+        .attr("r", 8)
+        .style("opacity", 1)
+        .style("stroke-width", 2)
+        .style("stroke", "#ffffff")
+        }
+
+        var mouseout_UAS = function(d) {
+        tooltip_UAS
+        .transition(t_tooltip)
+        .duration(0)
+        .style("opacity", 0)
+        // Change back circle when mouseout
+        d3.select(this)
+        .transition()
+        .duration(200)
+        .attr("r", 6)
+        .style("opacity", 0.9)
+        .style("stroke-width", 0.8)
+        .style("stroke", "#404040")
+        }
+      
+        //----------------------------------------//
+        // Dots for different establishment years //
+        //----------------------------------------//
+
+        layer4.selectAll("circle_UAS")
+        .data(data_mun)
+        .enter()
+        .append("circle")
+        .attr("class", "circle_UAS")
+        .attr("cx", function(d) {
+            return projection([d.long_CNTR, d.lat_CNTR])[0];
+        })
+        .attr("cy", function(d) {
+            return projection([d.long_CNTR, d.lat_CNTR])[1];
+        })  
+        .attr("r", 7)
+        .style("fill", color_border)
+        .style("stroke", "#000000")
+        .style("stroke-width", 0.8)
+        .style("opacity", 0.9)
+        .on("mouseover", mouseover_UAS)
+        .on("mouseout", mouseout_UAS);
+
+    });
+
+
+///////////////////////////////////////////
+// Include borders for treatment regions //
+///////////////////////////////////////////
+
+    d3.json("https://raw.githubusercontent.com/schlegeltobias/maps_switzerland/main/g1g18_lonlat_ostschweiz.json", function(error, json) {
+
+
+
+    var border_ostch = layer3.selectAll(".border_ostch")
+                .data(json.features)
+    border_ostch
+    .enter()
+        .append("path")
+        .attr("class", "border_ostch")
+    .merge(border_ostch)
+    .attr("d", path)
+    .style("stroke-width", 1.2)
+    .style("stroke", color_border)
+    .style("stroke-opacity", 0.8)
+    .attr("fill", "none")
+    })
+
+    d3.json("https://raw.githubusercontent.com/schlegeltobias/maps_switzerland/main/g1g18_lonlat_genf.json", function(error, json) {
+
+    var border_ge = layer3.selectAll(".border_ge")
+                .data(json.features)
+    border_ge
+    .enter()
+        .append("path")
+        .attr("class", "border_ge")
+    .merge(border_ge)
+    .attr("d", path)
+    .style("stroke-width", 1.2)
+    .style("stroke", color_border)
+    .style("stroke-opacity", 0.8)
+    .attr("fill", "none")
+    })
+
+
+    d3.json("https://raw.githubusercontent.com/schlegeltobias/maps_switzerland/main/g1g18_lonlat_mittelland_ohne_seen.json", function(error, json) {
+
+    var border_ml = layer3.selectAll(".border_ml")
+                .data(json.features)
+    border_ml
+    .enter()
+        .append("path")
+        .attr("class", "border_ml")
+    .merge(border_ml)
+    .attr("d", path)
+    .style("stroke-width", 1.2)
+    .style("stroke", color_border)
+    .style("stroke-opacity", 0.8)
+    .attr("fill", "none")
+    })
+
+    d3.json("https://raw.githubusercontent.com/schlegeltobias/maps_switzerland/main/g1g18_lonlat_wallis.json", function(error, json) {
+
+    var border_vs = layer3.selectAll(".border_vs")
+                .data(json.features)
+    border_vs
+    .enter()
+        .append("path")
+        .attr("class", "border_vs")
+    .merge(border_vs)
+    .attr("d", path)
+    .style("stroke-width", 1.2)
+    .style("stroke", color_border)
+    .style("stroke-opacity", 0.8)
+    .attr("fill", "none")
+    })
+
+    d3.json("https://raw.githubusercontent.com/schlegeltobias/maps_switzerland/main/g1g18_lonlat_tessin_sued.json", function(error, json) {
+
+    var border_tis = layer3.selectAll(".border_tis")
+                .data(json.features)
+    border_tis
+    .enter()
+        .append("path")
+        .attr("class", "border_tis")
+    .merge(border_tis)
+    .attr("d", path)
+    .style("stroke-width", 1.2)
+    .style("stroke", color_border)
+    .style("stroke-opacity", 0.8)
+    .attr("fill", "none")
+    })
+
+
+    d3.json("https://raw.githubusercontent.com/schlegeltobias/maps_switzerland/main/g1g18_lonlat_tessin_nord.json", function(error, json) {
+
+    var border_tin = layer3.selectAll(".border_tin")
+                .data(json.features)
+    border_tin
+    .enter()
+        .append("path")
+        .attr("class", "border_tin")
+    .merge(border_tin)
+    .attr("d", path)
+    .style("stroke-width", 1.2)
+    .style("stroke", color_border)
+    .style("stroke-opacity", 0.8)
+    .attr("fill", "none")
+    })
+    
+//////////
+// Zoom //
+//////////
+
+    var zoom = d3.zoom()
+    .interpolate(d3.interpolate)
+    .scaleExtent([1,10])
+    .on("zoom", function() {
+        // the "zoom" event populates d3.event with an object that has
+        // a "translate" property (a 2-element Array in the form [x, y])
+        // and a numeric "scale" property
+        var e = d3.event.transform
+          // now, constrain the x and y components of the translation by the
+          // dimensions of the viewport
+          tx = Math.min(0, Math.max(e.x, widthValue - widthValue * e.k)),
+          ty = Math.min(0, Math.max(e.y, heightValue - heightValue * e.k));
+
+    svg.selectAll("path, .path_mun, .border_ostch, .border_ge, .border_ml, .border_vs, .border_tin, .border_tis, circle")
+                .attr("transform", ["translate(" + [tx, ty] + ")", "scale(" + e.k + ")"]
+                .join(" "));
+ 
+        })
+
+
+    // Set zoom on the group element (instead the svg element) to avoid that zooming is activated outside the map.
+    // Define one layer for zooming only is easier to avoid jumps --> Otherwise zooming jumps if the curser hits another layer. Now zooming for other layers (i.e., lakes, borders, UAS points) is disabled.
+    layer2.call(zoom)
+
+//-----------------//
+// Set initial map //
+//-----------------//
+
+document.getElementById("radio_pats").checked = true;
+var selectedMeasure = "pats"
+var selectedTimePeriod = 0
+updateInno()
+
+
+</script>
+	</body>
+</html>

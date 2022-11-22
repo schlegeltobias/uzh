@@ -1,0 +1,643 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Innovationse ffekte der FH-Gründung</title>
+
+<style>
+
+/*----------------*/
+/*Layout the grid-*/
+/*----------------*/
+
+.wrapper {
+  display: grid;
+  grid-gap: 10px;
+  grid-template-rows: repeat(auto-fill, 9em);
+  grid-template-columns: repeat(auto-fill, 15em);
+}
+
+#did_results {
+  grid-column: 1 / -1;
+}
+
+@media screen and (min-width: 1000px) {
+  #did_results {
+    grid-column: 1 / 6;
+  }
+
+}
+
+/*----*/
+/*Font*/
+/*----*/
+body {
+  font-family: Arial, Helvetica, sans-serif, sans-serif;
+}
+
+text {
+  font-size: 1rem;
+}
+
+/*--------------------/*
+/*Formating Checkboxes/*
+/*--------------------/*
+
+/* Customize the label (the container) */
+.container {
+    display: block;
+    position: relative;
+    padding-left: 35px;
+    margin-bottom: 12px;
+    cursor: pointer;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+  }
+  
+  /* Hide the browser's default radio button */
+  .container input {
+    position: absolute;
+    opacity: 0;
+    cursor: pointer;
+    height: 0;
+    width: 0;
+  }
+  
+  /* Create a custom radio button */
+  .checkmark {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 25px;
+    width: 25px;
+    background-color: #eee;
+    border-radius: 50%;
+  }
+  
+  /* On mouse-over, add a grey background color */
+  .container:hover input ~ .checkmark {
+    background-color: #ccc;
+  }
+  
+  /* When the radio button is checked, add a blue background */
+  .container input:checked ~ .checkmark {
+    background-color: rgb(117,107,177);
+  }
+  
+  /* Create the indicator (the dot/circle - hidden when not checked) */
+  .checkmark:after {
+    content: "";
+    position: absolute;
+    display: none;
+  }
+  
+  /* Show the indicator (dot/circle) when checked */
+  .container input:checked ~ .checkmark:after {
+    display: block;
+  }
+  
+  /* Style the indicator (dot/circle) */
+  .container .checkmark:after {
+    top: 7.5px;
+    left: 7.5px;
+    bottom: 7.5px; 
+    right: 7.5px; 
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: white;
+  } 
+
+
+.choose {
+  font-weight: 700;
+}
+
+
+  /*------------------*/
+  /*Formating Tooltips*/
+  /*------------------*/
+  
+  div.mytooltip {
+      position: absolute;
+      text-align: center;
+      padding: .5rem;
+      background-color: #F2F2F2;
+      border: none;
+      pointer-events: none; 
+      white-space: pre-line;
+    }
+  
+  
+  /*-------------------*/
+  /*Formating Help Icon*/
+  /*-------------------*/
+  
+
+  /* Define the icon */
+  .help-tip{
+      position: relative;
+      margin: auto;
+      text-align: center;
+      border: 2px solid #444;
+      border-radius: 50%;
+      width: 20px;
+      height: 20px;
+      line-height: 20px;
+      cursor: default;
+ }
+  
+  .help-tip:before{
+      content:'?';
+      color:#444;
+  }
+  
+  .help-tip:hover {
+      background-color: #F0F0F0;
+  }
+  
+  .help-tip:hover p{
+      display:block;
+      transform-origin: 100% 0%;
+      -webkit-animation: fadeIn 0.3s ease;
+      animation: fadeIn 0.3s ease;
+  }
+  
+  
+  /* The tooltip */
+  .help-tip p {    
+      display: none;
+      background-color: #F0F0F0;
+      padding: 12px 16px;
+      width: 250px;
+      height: auto;
+      position: absolute;
+      left: 50%;
+      transform: translate(10%, -75%);
+      color: #37393D;
+      line-height: 1.2em;
+      z-index: 101;
+      text-align: left;
+
+  }
+
+  /* CSS animation */
+@-webkit-keyframes fadeIn {
+    0% { opacity:0; }
+    100% { opacity:100%; }
+}
+
+@keyframes fadeIn {
+    0% { opacity:0; }
+    100% { opacity:100%; }
+}
+
+/*--------------------------------*/
+/* Position of all the Help Icons */
+/*--------------------------------*/
+
+.choose {
+  position: relative;
+  margin: 0pt;
+}
+
+#help_tip_precon {
+  position: absolute;
+  left: 16em;
+  top: 0.5em;
+  z-index:99;
+}
+
+#help_tip_precon p {
+    transform: translate(15%, -10%);
+}
+
+</style>
+
+</head>
+
+
+<!--Source of most of the code: 
+    https://www.d3-graph-gallery.com/graph/scatter_basic.html -->
+
+<body>
+  <!-- Load d3.js used for creating the figures-->
+<script src="https://d3js.org/d3.v5.js"></script>
+
+<!--------------------------------------
+--Wrapper (around legend and map divs) -
+--------------------------------------->
+
+<div class="wrapper">
+
+<!------------------------------------------------------------
+--Radio Buttons and info-tooltips for economic preconditions -
+------------------------------------------------------------->
+
+    <div>
+        <p class="choose"><strong>Wählen Sie eine Vorbedingung:</strong></p>
+        <p>
+            <label onclick ="updateData()" class="container">Grösse des Arbeitsmarktes
+            <input id="radio_fe_did" type="radio" name="radio" value="fe">
+            <span class="checkmark"></span>
+            </label>
+        </p>    
+        <p>
+            <label onclick ="updateData()" class="container">Dichte des Arbeitsmarktes
+            <input id="radio_phe_did" type="radio" name="radio" value="phe">
+            <span class="checkmark"></span>
+            </label>
+        </p>
+        <p>
+            <label onclick ="updateData()" class="container">High-Tech-Intensität
+            <input id="radio_hts_did" type="radio" name="radio" value="hts">
+            <span class="checkmark"></span>
+            </label>
+        </p>
+        <p>
+            <label onclick ="updateData()" class="container">Zurücksetzen
+            <input id="radio_clear_did" type="radio" name="radio" value="empty">
+            <span class="checkmark"></span>
+            </label>
+        </p>
+        <div class="help-tip" id="help_tip_precon">
+          <p> <b> Vorbedingung:</b> Zeigt die regionalökonomischen Vorbedingung einer Gemeinde für Innovationsaktivitäten. Vorbedingungen werden in den Jahren vor der FH-Gründung gemessen und sind somit von den FHs unbeeinflusst. Günstige Vorbedingungen haben das Potenzial, Innovationseffekte der FHs zu verstärken. <br/><br/>
+          </br>
+          <b>Grösse des Arbeitsmarktes:</b> Anzahl Beschäftigte in einer Gemeinde. <br/>
+          <b>Dichte des Arbeitsmarktes:</b> Anzahl Beschäftigte pro Fläche einer Gemeinde.<br/>
+          <b>High-Tech-Intensität:</b> Anteil Beschäftigte in High-Tech Industrien.
+          </p>
+       </div>
+    </div>
+
+
+<!-------------------------------------
+--Div where the map will be placed in -
+-------------------------------------->
+<div id="did_results"></div>
+</div>
+
+
+<!--------------------------------------------
+--Script for interactive DID coefficientplot--
+--------------------------------------------->
+<script>
+
+// Define Colors
+var color_est = "rgba(117,107,177,1)"
+var color_ci = "rgba(188,189,220, 0.6"
+
+
+
+
+ // set the dimensions and margins of the graph
+ var margin = {top: 60, right: 30, bottom: 100, left: 70};
+var heightValue = 500 - margin.top - margin.bottom;
+var widthValue = 800 - margin.left - margin.right;
+// append an svg object to the body of the page
+var svg = d3.select("#did_results")
+.append("svg")
+// Defines the size of the svg elements View Box
+.attr("viewBox", "0 0 800 500")
+  // .attr("viewBox", "0 0 1000 1500")
+// Creates an SVG groupelement which is used to group SVG (scalable vector graphics) shapes together
+.append("g")
+//Used to transform the SVG group elemnts:
+//Translate therby shifts the grouped elements along the x or y axis (dx dy)
+//One could also rotate the grouped elements, .e.g, rotate(-90 180 180) where the first number indicates the angle and the others the point around which the g elemnt is rotated
+  .attr("transform",
+        "translate(" + margin.left + "," + margin.top + ")");
+
+       
+//----------//
+// Add Axes //
+//----------//  
+ 
+// Make a linear scale for the x-axis
+var xScale = d3.scaleLinear()
+  .domain([0.5,4.5])
+  .range([0, widthValue]);
+  // Make an axis generator
+var xAxisGenerator = d3.axisBottom(xScale)
+// Customize tick labels
+var tickLabels = ["", "", "", ""];
+xAxisGenerator.ticks(4)
+xAxisGenerator.tickFormat((d,i) => tickLabels[i]);
+// Render the axis with .call
+var xAxis = svg.append("g")
+              .call(xAxisGenerator);
+// Translating the axis to the bottom of the visualization
+xAxis.attr("transform", "translate(0," + heightValue + ")")
+     .attr("class", "myXaxis")
+// Formating the Text of the axis
+.selectAll("text")
+  .style("text-anchor", "middle")
+
+
+// Make a linear scale for the y-axis
+var yScale = d3.scaleLinear()
+    .domain([-10, 30])
+    .range([ heightValue, 0 ]);
+  // Make an axis generator
+var yAxisGenerator = d3.axisLeft(yScale)
+// Define Space between Ticks and Labels
+yAxisGenerator.tickPadding(20)
+// Make a grid for the y-axis
+yAxisGenerator.tickSize(-700)
+// Render the axis with .call
+var yAxis = svg.append("g")
+              .call(yAxisGenerator)
+// Translating the axis to the bottom of the visualization
+yAxis.attr("transform", "translate(0," - widthValue + ")")
+.attr("class", "myYaxis")
+// Formating the Text of the axis
+.selectAll("text")
+  .style("text-anchor", "middle")
+  //.style("font", "1rem Arial, Helvetica, sans-serif, sans-serif")
+  // Formating the grid
+yAxis.selectAll(".tick line")
+  .attr("stroke", "gray")
+  .attr("stroke-width", "0.2");
+
+//------------------//
+// Draw zero y line //
+//------------------//
+
+svg.append("line")
+  .style("stroke", "black")
+  .style("stroke-width", 1)
+  .attr("x1", xScale(0.5))
+  .attr("y1", yScale(0))
+  .attr("x2", xScale(4.5))
+  .attr("y2", yScale(0));    
+
+//-----------------------------------------//
+// Draw dividing line between comparissons //
+//-----------------------------------------//
+  
+svg.append("line")
+  .style("stroke", "gray")
+  .style("stroke-width", 1)
+  .attr("x1", xScale(4.5))
+  .attr("y1", yScale(-.10))
+  .attr("x2", xScale(4.5))
+  .attr("y2", yScale(0.3));        
+
+
+//---------------//
+// y- Axis Title //
+//---------------//
+
+svg.append("text")
+  .attr("class", "y label")
+  .attr("text-anchor", "middle")
+  .attr("x", -170)
+  .attr("y", -50)
+  .attr("transform", "rotate(-90)")
+  .text("Innovationseffekte der FH-Gründung in %")
+    .style("fill", "black")
+
+//---------------//
+// x- Axis Title //
+//---------------//
+
+svg.append("text")
+  .attr("class", "x_title")
+  .attr("text-anchor", "middle")
+  .attr("x", +350)
+  .attr("y", +80)
+  .attr("transform", "translate(0," + heightValue + ")")
+  .text("Gruppe bezüglich ausgewählter Vorbedingung")
+    .style("fill", "black");
+
+
+//-------------------------------------------//
+// x-Axis Label (manually because two lines) //
+//-------------------------------------------//
+
+svg.append("text")
+.attr("class", "x_title")
+.text("tiefste Ausprägung")
+  .attr("text-anchor", "middle")
+  .attr("x", +90)
+  .attr("y", +25)
+  .attr("transform", "translate(0," + heightValue + ")")
+
+  svg.append("text")
+.attr("class", "x_title")
+.text("(0%-25%)")
+  .attr("text-anchor", "middle")
+  .attr("x", +90)
+  .attr("y", +47)
+  .attr("transform", "translate(0," + heightValue + ")")
+
+svg.append("text")
+.attr("class", "x_title")
+.text("tiefe Ausprägung")
+  .attr("text-anchor", "middle")
+  .attr("x", +265)
+  .attr("y", +25)
+  .attr("transform", "translate(0," + heightValue + ")")
+
+svg.append("text")
+.attr("class", "x_title")
+.text("(25%-50%)")
+  .attr("text-anchor", "middle")
+  .attr("x", +265)
+  .attr("y", +47)
+  .attr("transform", "translate(0," + heightValue + ")")
+
+svg.append("text")
+.attr("class", "x_title")
+.text("hohe Ausprägung")
+  .attr("text-anchor", "middle")
+  .attr("x", +440)
+  .attr("y", +25)
+  .attr("transform", "translate(0," + heightValue + ")")
+
+svg.append("text")
+.attr("class", "x_title")
+.text("(50%-75%)")
+  .attr("text-anchor", "middle")
+  .attr("x", +440)
+  .attr("y", +47)
+  .attr("transform", "translate(0," + heightValue + ")")
+
+svg.append("text")
+.attr("class", "x_title")
+.text("höchste Ausprägung")
+  .attr("text-anchor", "middle")
+  .attr("x", +615)
+  .attr("y", +25)
+  .attr("transform", "translate(0," + heightValue + ")")
+
+svg.append("text")
+.attr("class", "x_title")
+.text("(75%-100%)")
+  .attr("text-anchor", "middle")
+  .attr("x", +615)
+  .attr("y", +47)
+  .attr("transform", "translate(0," + heightValue + ")")
+
+//-----------------//  
+//-----------------//
+// Update Function //
+//-----------------//
+//-----------------//
+
+
+// Set counter to identify initialization of graph
+let counter = 0;
+
+// Create a function that takes a dataset as input and update the plot:
+function updateData() {
+
+// Get selected economic precondition
+if(document.getElementById("radio_fe_did").checked) {   
+        var selectedMeasure = document.getElementById("radio_fe_did").value   
+} else if(document.getElementById('radio_phe_did').checked) {   
+        var selectedMeasure = document.getElementById("radio_phe_did").value   
+} else if(document.getElementById('radio_hts_did').checked) {   
+    var selectedMeasure = document.getElementById("radio_hts_did").value            
+} else if(document.getElementById("radio_clear_did").checked) {
+    var selectedMeasure = document.getElementById("radio_clear_did").value
+}
+
+// ------------------------------//
+// Define different transitions //
+// -----------------------------//
+
+// Identifier for either first transition or transition after "clear all"
+counter += 1;
+var svgSizeLine = svg.selectAll(".line1").size()
+
+// Defines speed of transition: immediate if first transition of after "clear all", slow transition if change in figure.
+if (counter !=1 & svgSizeLine !=0) {
+    var t = 300
+} else if(counter == 1) {
+    var t = 0
+}
+
+
+d3.csv("https://raw.githubusercontent.com/schlegeltobias/maps_switzerland/main/data_did_"+selectedMeasure+".csv")
+.then(function(data) {
+
+data.forEach(function(d) {
+    d.quartile = +d.quartile;
+    d.effect = +d.effect;
+    d.lb = +d.lb;
+    d.ub = +d.ub;  
+});
+
+
+//Create an update selection: Confidence Intervals for comparisson to same quartile in the control group
+
+var u3 = svg.selectAll(".line1")
+.data(data.filter(function(d){return xScale(d.quartile) < xScale(5);}))
+
+u3
+.enter()
+.append("line")
+.attr("class", "line1")
+  .style("stroke", color_ci)
+  .style("stroke-width", 10)
+  .style("stroke-linecap", "round")
+.merge(u3)
+.transition()
+    .duration(t)
+  .attr("x1", function (d) { return xScale(d.quartile);})
+  .attr("y1", function (d) { return yScale(d.lb)})
+  .attr("x2", function (d) { return xScale(d.quartile);})
+  .attr("y2", function (d) { return yScale(d.ub)});
+
+// Create an update selection: Coefficients for comparisson to same quartile in the control group
+var u1 = svg.selectAll(".circle1")
+.data(data.filter(function(d){return xScale(d.quartile) < xScale(5);}))
+.on("mouseover", mouseover_left)
+.on("mouseout", mouseout_left);
+
+u1
+.enter()
+.append("circle")
+.attr("class","circle1")
+.merge(u1)
+.transition()
+    .duration(t)
+.attr("cx", function (d) { return xScale(d.quartile); } )
+.attr("cy", function (d) { return yScale(d.effect); } )
+.attr("r", 12)
+.style("fill", color_est)
+
+//--------------------------------//
+// Clear figure if no data chosen //
+//--------------------------------//
+
+var selectedMeasureEmpty = document.getElementById("radio_clear_did").checked
+
+if(selectedMeasureEmpty = true) {
+u3.exit().remove()
+u1.exit().remove()
+}
+
+})
+
+}
+
+// ---------------------------------------//
+// Tooltips providing further information //
+// ---------------------------------------//
+    
+var tooltip_left = d3.select("body").append("div")
+.attr("class", "mytooltip")
+.style("opacity", 0)
+.style("color", color_est)
+
+// ------------------------------------------//
+// Show Tooltip when mouse is on coefficient //
+// ------------------------------------------//
+
+var mouseover_left =  function(d) {
+  // Defines Coefficient Value and its format
+    var effectSize = d3.format(".1f")(d.effect);
+    // Defines style of the tooltip    
+    tooltip_left.transition()
+    .duration(0)
+    .style("opacity", 1)
+      // Fills the tooltip
+      if (effectSize >= 0) {
+      tooltip_left.html("Eine Gemeinde in einer FH-Region hat nach der FH-Gründung durchschnittlich eine um " + effectSize +"% höhere Innovationstätigkeit als eine Gemeinde aus derselben Gruppe, die sich ausserhalb einer FH-Region befindet.")
+      .style("left", (d3.event.pageX+10) + "px")
+      .style("top", (d3.event.pageY+10) + "px")
+      } else {
+      tooltip_left.html("Eine Gemeinde in einer FH-Region hat nach der FH-Gründung durchschnittlich eine um " + effectSize +"% tiefere Innovationstätigkeit als eine Gemeinde aus derselben Gruppe, die sich ausserhalb einer FH-Region befindet.")
+      .style("left", (d3.event.pageX+10) + "px")
+      .style("top", (d3.event.pageY+10) + "px")  
+      }
+  }
+
+var mouseout_left = function(d) {
+  tooltip_left
+  .transition()
+  .duration(0)
+  .style("opacity", 0)
+}
+
+
+
+//------------------------//
+// Initiate Default Graph-//
+//------------------------//
+
+// Initial Value is Labor Market Size and Quartile 4
+document.getElementById("radio_fe_did").checked = true;
+selectedMeasure = "fe"
+updateData()
+
+</script>
+
+</body>
+</html>

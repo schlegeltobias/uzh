@@ -1,0 +1,722 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Schweizer FH-Standorte</title>
+<style>
+
+/*----------------*/
+/*Layout the grid-*/
+/*----------------*/
+
+.wrapper {
+  display: grid;
+  grid-gap: 0px;
+  grid-template-rows: repeat(auto-fill, 11em);
+  grid-template-columns: repeat(auto-fill, 20em);
+}
+
+#map_switzerland{
+  grid-column: 1 / -1;
+}
+
+@media screen and (min-width: 1000px) {
+  #map_switzerland {
+    grid-column: 1 / 6;
+  }
+
+}
+
+/*----*/
+/*Font*/
+/*----*/
+body {
+  font-family: Arial, Helvetica, sans-serif, sans-serif;
+}
+
+/*--------------------/*
+/*Formating Checkboxes/*
+/*--------------------/*
+
+/* Customize the label (the container2) */
+.container2 {
+    display: block;
+    position: relative;
+    padding-left: 35px;
+    margin-bottom: 12px;
+    cursor: pointer;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+
+  }
+  
+  /* Hide the browser's default radio button */
+  .container2 input {
+    position: absolute;
+    opacity: 0;
+    cursor: pointer;
+    height: 0;
+    width: 0;
+  }
+  
+  /* Create a custom radio button */
+  .checkmark {
+      position: absolute;
+      top: 0;
+      left: 0;
+      height: 25px;
+      width: 25px;
+      background-color: #eee;
+      border-radius: 50%;
+    }
+    
+  
+  /* On mouse-over, add a grey background color */
+  .container2:hover input ~ .checkmark {
+    background-color: #ccc;
+  }
+  
+  /* When the radio button is checked, add a blue background */
+  .container2 input:checked ~ .checkmark {
+    background-color: #d7301f;
+  }
+  
+  /* Create the indicator (the dot/circle - hidden when not checked) */
+  .checkmark:after {
+    content: "";
+    position: absolute;
+    display: none;
+  }
+  
+  /* Show the indicator (dot/circle) when checked */
+  .container2 input:checked ~ .checkmark:after {
+    display: block;
+  }
+  
+/* Style the indicator (dot/circle) */
+.container2 .checkmark:after {
+    top: 7.5px;
+    left: 7.5px;
+    bottom: 7.5px;
+    right: 7.5px;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: white;
+}
+
+  #choose_precon, #legend_quartile_title, #legend_UAS_title{
+    font-weight: 700;
+    
+}
+
+/*------------------*/
+/*Formating Tooltips*/
+/*------------------*/
+
+  div.mytooltip {
+    position: absolute;
+    text-align: center;
+    padding: .5rem;
+    background-color: #F2F2F2;
+    border: none; 
+    pointer-events: none; 
+    white-space: pre-line;
+    font-family: Arial, Helvetica, sans-serif, sans-serif;
+  }
+
+
+/*-------------------*/
+/*Formating Help Icon*/
+/*-------------------*/
+
+/* Define the icon */
+.help-tip{
+	position: relative;
+	margin: auto;
+	text-align: center;
+	border: 2px solid #444;
+	border-radius: 50%;
+	width: 20px;
+	height: 20px;
+	line-height: 20px;
+	cursor: default;
+
+}
+
+.help-tip:before{
+    content:'?';
+    color:#444;
+
+}
+
+.help-tip:hover {
+      background-color: #F0F0F0;
+  }
+
+.help-tip:hover p{
+    display:block;
+    transform-origin: 100% 0%;
+    -webkit-animation: fadeIn 0.3s ease;
+    animation: fadeIn 0.3s ease;
+
+}
+
+/* The tooltip */
+.help-tip p {    
+	display: none;
+	background-color: #F2F2F2;
+	padding: 12px 16px;
+	width: 250px;
+	height: auto;
+	position: absolute;
+	left: 50%;
+	transform: translate(10%, -75%);
+ 	border: none;
+	color: #37393D;
+	line-height: 1.2em;
+	z-index: 99;
+    text-align: left;
+}
+
+/* CSS animation */
+@-webkit-keyframes fadeIn {
+    0% { opacity:0; }
+    100% { opacity:100%; }
+}
+
+@keyframes fadeIn {
+    0% { opacity:0; }
+    100% { opacity:100%; }
+}
+
+/*--------------------------------*/
+/* Position of all the Help Icons */
+/*--------------------------------*/
+
+#legend_precondition, #legend_quartile, #legend_UAS {
+      position: relative;
+  }
+
+#help_tip_UAS, #help_tip_quartile, #help_tip_precon {
+position: absolute;
+}
+
+#help_tip_precon {
+    left: 15em;
+    top: 1em;
+    z-index:99;
+}
+
+#help_tip_quartile {
+    left: 13.2em;
+    top: 1em;
+    z-index: 98;
+}
+
+#help_tip_UAS {
+    left: 8.8em;
+    top: 1em;
+    z-index: 97;
+}
+
+#help_tip_precon p, #help_tip_quartile p {
+    transform: translate(15%, -10%);
+}
+
+@media only screen and (min-width: 1000px) {
+#help_tip_UAS p {
+  transform: translate(-40%, 20%);
+}
+}
+
+@media only screen and (max-width: 999px) {
+#help_tip_UAS p {
+  transform: translate(-20%, 20%);
+}
+}
+
+
+        
+</style>
+
+</head>
+
+<!-- Load D3 and Topojson-->
+<script src="https://d3js.org/d3.v4.min.js"></script>
+<script src="//d3js.org/topojson.v1.min.js"></script>
+<!-- Color Scheme-->
+<script src="https://d3js.org/colorbrewer.v1.min.js"></script>
+
+<body>
+  
+<!--------------------------------------
+--Wrapper (around legend and map divs) -
+--------------------------------------->
+    <div class="wrapper">
+
+<!------------------------------------------------------------
+--Radio Buttons and info-tooltips for economic preconditions -
+------------------------------------------------------------->
+       
+        <div id="legend_precondition">
+            <p id="choose_precon">Wählen Sie eine Vorbedingung</p>
+            <p>
+                <label id= radio_fe1, class="container2" onclick = "updatePrecon()">Grösse des Arbeitsmarktes
+                <input id="radio_fe2" type="radio" value="fe" name="radio" checked="checked">
+                <span class="checkmark"></span>
+                </label>
+            </p>    
+            <p>
+                <label id=radio_phe1, class="container2" onclick = "updatePrecon()">Dichte des Arbeitsmarktes
+                <input id="radio_phe2" type="radio" value="phe" name="radio">
+                <span class="checkmark"></span>
+                </label>
+            </p>
+            <p>
+                <label id=radio_hts1, class="container2" onclick = "updatePrecon()">High-Tech-Intensität
+                <input id="radio_hts2" type="radio" value="hts" name="radio">
+                <span class="checkmark"></span>
+                </label>
+            </p>
+
+            <div class="help-tip" id="help_tip_precon">
+                <p> <b> Vorbedingung:</b> Zeigt die regionalökonomischen Vorbedingung einer Gemeinde für Innovationsaktivitäten. Vorbedingungen werden in den Jahren vor der FH-Gründung gemessen und sind somit von den FHs unbeeinflusst. Günstige Vorbedingungen haben das Potenzial, Innovationseffekte der FHs zu verstärken. <br/><br/>
+                </br>
+                <b>Grösse des Arbeitsmarktes:</b> Anzahl Beschäftigte in einer Gemeinde. <br/>
+                <b>Dichte des Arbeitsmarktes:</b> Anzahl Beschäftigte pro Fläche einer Gemeinde.<br/>
+                <b>High-Tech-Intensität:</b> Anteil Beschäftigte in High-Tech Industrien.
+                </p>
+             </div>
+        </div>
+
+<!----------------------------------------
+--Legend and info-tooltips for quartiles -
+----------------------------------------->
+
+        <div id="legend_quartile">
+            <p id="legend_quartile_title">Ausprägung Vorbedingung</p>
+            <div class="help-tip" id="help_tip_quartile">
+                <p>Die vier Farben stehen für <b>vier gleich grosse Gruppen</b>, die je 25% der Gemeinden enthalten. 
+                </br></br>Die Gruppeneinteilung wiederspiegelt die Ausprägung einer Gemeinde bezüglich der jeweiligen Vorbedingung.</p>
+            </div>
+        </div>
+
+<!------------------------------------------------------
+--Legend and info-tooltips for UAS establishment years -
+------------------------------------------------------->
+       
+        <div id="legend_UAS">
+            <p id="legend_UAS_title">Fachhochschulen</p>
+            <div class="help-tip" id="help_tip_UAS">
+                <p><b>FH-Standorte:</b> Campus an dem MINT-Fächer unterrichtet werden. Eine FH kann dabei aus mehreren Standorten bestehen.
+                </br></br>
+                <b>FH-Regionen:</b> Alle Gemeinden im Umkreis von 25 Kilometern um einen FH-Standort.
+                </br></br>
+                <b>FH-Gründungsjahr</b> (Maus auf FH-Standort bewegen): Entspricht entweder dem Jahr an dem ein FH-Standort neu eröffnet wurde oder an dem eine Vorgängerinstitution offiziell zu einer FH wurde (Genehmigung durch Bundesrat).
+                </p>
+            </div>
+        </div>       
+        
+        <!-- Create a div where the graph will live -->
+        <div id="map_switzerland"></div>
+        </div>
+
+<!-- Script for the interactive map -->
+<script>
+
+// Width, height and margins
+var margin = {top: 0, right: 300, bottom: 0, left: 0 };
+var heightValue = 400 - margin.top - margin.bottom;
+var widthValue = 1000 - margin.left - margin.right;
+
+// Data on quartiles
+
+//Defin the projection method, and its translation and scale
+var projection = d3.geoMercator()
+					.scale([7500])
+					.center([8.5,46.8])
+					.translate([widthValue/2, heightValue/2])
+
+//Define path generator, using the Albers USA projection
+var path = d3.geoPath()
+				.projection(projection);
+
+//Create SVG element
+var svg = d3.select("#map_switzerland")
+			.append("svg")
+			.attr("viewBox", "0 0 650 400")
+            .attr("transform",
+            "translate(" + margin.left + "," + margin.top + ")");
+
+// Bind svg elemnt to a group            
+var layer1 = svg.append("g");
+var layer2 = svg.append("g");
+var layer3 = svg.append("g");
+var layer4 = svg.append("g")
+
+
+// Define Color for UASs 
+color_border = "#252525"
+
+// //--------//
+// // Legend //
+// //--------//
+
+var margin_legend = {top: 0, right: 0, bottom: 0, left: 0};
+
+//Create SVG element for UAS establishment year legend
+var svg_legend_UAS = d3.select("#legend_UAS")
+			.append("svg")
+            .attr("height", 220)
+			.attr("transform",
+             "translate(" + margin_legend.left + "," + margin_legend.top + ")");
+
+
+//FH-Gründungsjahr
+svg_legend_UAS.append("circle").attr("cx", 13).attr("cy",13).attr("r", 12).style("fill", color_border).style("stroke", "#000000").style("stroke-width", 0.8)
+svg_legend_UAS.append("text").attr("x", 37).attr("y", 15).text("FH-Standort").style("dominant-baseline", "middle")
+
+//FH-Region
+svg_legend_UAS.append('line')
+  .attr("x1",0).attr("y1",50).attr("x2",25).attr("y2",50)
+  .style("stroke", color_border)
+  .style("stroke-width", 4)
+  .style("stroke-opacity", 0.8)
+
+svg_legend_UAS.append("text").attr("x", 37).attr("y", 50).text("FH-Regionen").style("dominant-baseline", "middle")
+
+//Create SVG element for quartile legend
+var svg_legend_quartile = d3.select("#legend_quartile")
+			.append("svg")
+            .attr("height", 260)
+			.attr("transform",
+            "translate(" + margin_legend.left + "," + margin_legend.top + ")");
+
+// // TG Rectangles
+svg_legend_quartile.append("rect").attr("x", 0).attr("y", 0).attr("width", 20).attr("height", 20).style("fill", '#fef0d9')
+svg_legend_quartile.append("rect").attr("x", 0).attr("y", 30).attr("width", 20).attr("height", 20).style("fill", '#fdcc8a')
+svg_legend_quartile.append("rect").attr("x", 0).attr("y", 60).attr("width", 20).attr("height", 20).style("fill", '#fc8d59')
+svg_legend_quartile.append("rect").attr("x", 0).attr("y", 90).attr("width", 20).attr("height", 20).style("fill", '#d7301f')
+
+// Quartile Text
+svg_legend_quartile.append("text").attr("class", "border1").attr("x", 38).attr("y", 15).text("tiefste Ausprägung (0%-25%")
+svg_legend_quartile.append("text").attr("class", "border2").attr("x", 38).attr("y", 45).text("tiefe Ausprägung (25%-50%)")
+svg_legend_quartile.append("text").attr("class", "border3").attr("x", 38).attr("y", 75).text("hohe Ausprägung (50%-75%)")
+svg_legend_quartile.append("text").attr("class", "border4").attr("x", 38).attr("y", 105).text("höchste Ausprägung (75%-100%)")
+
+//Load in TopoJSON data for lages
+//Datasource https://swiss-maps.vercel.app/ (using WGS 84 coordinates and only including lakes)
+//Since only downloadable as a topojson, it must be included somewhat differently than the other data
+d3.json("https://raw.githubusercontent.com/schlegeltobias/maps_switzerland/main/swiss-maps_lakes.json", function(error, json) {
+    layer1.append("path")
+        .datum(topojson.feature(json, json.objects.lakes))
+        .attr("class", "path_lake")
+        .attr("d", path)
+        .style("fill", "#ADD8E6")
+        .style("stroke-width", 0)
+        .style("stroke", "#A7C7E7")
+})
+
+
+function updatePrecon() {
+    // Find selected econonmic precondition 
+    if(document.getElementById("radio_fe2").checked) {   
+            var selectedMeasure = document.getElementById("radio_fe2").value   
+    } else if(document.getElementById('radio_phe2').checked) {   
+            var selectedMeasure = document.getElementById("radio_phe2").value   
+    } else if(document.getElementById('radio_hts2').checked) {   
+        var selectedMeasure = document.getElementById("radio_hts2").value            
+    } else {   
+        document.getElementById("error").innerHTML   
+            var selectedMeasure = pats;   
+    }
+
+d3.csv("https://raw.githubusercontent.com/schlegeltobias/maps_switzerland/main/data_"+selectedMeasure+".csv", function(data) {
+
+// Define parameters of the transition (fast or slow transition)
+var t = d3.transition()
+        .duration(750)
+
+// Define columns to use
+var precondition = data.map(d => Number(d.quartile))
+
+// Use colors from https://colorbrewer2.org/
+var scale = d3.scaleQuantile(precondition)
+            .range(colorbrewer.OrRd[4])
+            .domain([1, 2, 3, 4]);
+
+//Load in GeoJSON data for municipalities
+    d3.json("https://raw.githubusercontent.com/schlegeltobias/maps_switzerland/main/g1g18_lonlat.json", function(json) {
+	// Merge the two data files
+	// Loop through municipalities in quartile dataset
+    for (var i = 0; i < data.length; i++) {
+	// Grab Municipality's economic precondition
+		var dataMunicipality = data[i].GMDENR_2018;
+		// Grab quartile 
+        var dataValue = data[i].quartile
+	// Loop through municipalities in geojson
+	for (var j = 0; j < json.features.length; j++) {
+		var jsonMunicipality = json.features[j].properties.GMDNR;
+	// Copy the data on quartiles and treatment status into the JSON for municipalities that match
+	if (dataMunicipality == jsonMunicipality) {
+		json.features[j].properties.value = dataValue
+		break;
+			}
+		}
+}
+
+//Bind data and create one path per GeoJSON feature
+var paths = layer2.selectAll(".path_mun")
+                .data(json.features)
+paths
+    .enter()
+        .append("path")
+        .attr("class", "path_mun")
+    .merge(paths)
+    .transition(t)
+            .attr("d", path)
+    .style("stroke-width", 0.2)
+    .style("stroke", "#d3d3d3")
+    .style("fill", function(d) {
+        var value = d.properties.value;
+        if (typeof value != "undefined"){
+            return scale(value);
+        } else {
+            return "#ffffcc"
+        }
+    })
+    })
+
+});
+}
+
+//-------------------------//
+// UAS establishment Years //
+//-------------------------//
+
+d3.csv("https://raw.githubusercontent.com/schlegeltobias/maps_switzerland/main/Generalisierte_Gemeindegrenzen_Schweiz_FH_Gemeinden.csv", function(data_mun) {
+
+        //---------//
+        // Tooltip //
+        //---------//
+
+        var t_tooltip = d3.transition()
+        .duration(500)
+        
+        // Municipality Name and Establishment Year
+        var tooltip_UAS = d3.select("body").append("div")
+        .attr("class", "mytooltip")
+        .style("opacity", 0)
+        .style("color", color_border)
+
+        var mouseover_UAS =  function(d) { 
+        // Defines Coefficient Value and its format
+            var UAS_mun = d.GMDNAME
+            var UAS_begin =d.begin
+            // Defines style of the tooltip    
+            tooltip_UAS.transition(t_tooltip)
+            .duration(0)
+            .style("opacity", 1)
+            // Fills the tooltip
+            tooltip_UAS.html("<p align=left><b>FH-Standort</b>: " + UAS_mun +"</p> " +"<p align=left><b>FH-Gründungsjahr</b>: " + UAS_begin +"</p>")
+            .style("left", (d3.event.pageX+10) + "px")
+            .style("top", (d3.event.pageY+10) + "px")
+        // Change circle when mouseover
+        d3.select(this)
+        .transition()
+        .duration(200)
+        .attr("r", 8)
+        .style("opacity", 1)
+        .style("stroke-width", 2)
+        .style("stroke", "#ffffff")
+        }
+
+        var mouseout_UAS = function(d) {
+        tooltip_UAS
+        .transition(t_tooltip)
+        .duration(0)
+        .style("opacity", 0)
+        // Change back circle when mouseout
+        d3.select(this)
+        .transition()
+        .duration(200)
+        .attr("r", 6)
+        .style("opacity", 0.9)
+        .style("stroke-width", 0.8)
+        .style("stroke", "#404040")
+        }
+      
+    //----------------------------------------//
+    // Dots for different establishment years //
+    //----------------------------------------//
+
+    layer4.selectAll("circle_UAS")
+    .data(data_mun)
+    .enter()
+    .append("circle")
+    .attr("class", "circle_UAS")
+    .attr("cx", function(d) {
+        return projection([d.long_CNTR, d.lat_CNTR])[0];
+    })
+    .attr("cy", function(d) {
+        return projection([d.long_CNTR, d.lat_CNTR])[1];
+    })  
+    .attr("r", 7)
+    .style("fill", color_border)
+    .style("stroke", "#000000")
+    .style("stroke-width", 0.8)
+    .style("opacity", 0.9)
+    .on("mouseover", mouseover_UAS)
+    .on("mouseout", mouseout_UAS);
+
+    });
+
+
+///////////////////////////////////////////
+// Include borders for treatment regions //
+///////////////////////////////////////////
+
+    d3.json("https://raw.githubusercontent.com/schlegeltobias/maps_switzerland/main/g1g18_lonlat_ostschweiz.json", function(error, json) {
+
+    var border_ostch = layer3.selectAll(".border_ostch")
+                .data(json.features)
+    border_ostch
+    .enter()
+        .append("path")
+        .attr("class", "border_ostch")
+    .merge(border_ostch)
+    .attr("d", path)
+    .style("stroke-width", 1.2)
+    .style("stroke", color_border)
+    .style("stroke-opacity", 0.8)
+    .attr("fill", "none")
+    })
+
+    d3.json("https://raw.githubusercontent.com/schlegeltobias/maps_switzerland/main/g1g18_lonlat_genf.json", function(error, json) {
+
+    var border_ge = layer3.selectAll(".border_ge")
+                .data(json.features)
+    border_ge
+    .enter()
+        .append("path")
+        .attr("class", "border_ge")
+    .merge(border_ge)
+    .attr("d", path)
+    .style("stroke-width", 1.2)
+    .style("stroke", color_border)
+    .style("stroke-opacity", 0.8)
+    .attr("fill", "none")
+    })
+
+
+    d3.json("https://raw.githubusercontent.com/schlegeltobias/maps_switzerland/main/g1g18_lonlat_mittelland_ohne_seen.json", function(error, json) {
+
+    var border_ml = layer3.selectAll(".border_ml")
+                .data(json.features)
+    border_ml
+    .enter()
+        .append("path")
+        .attr("class", "border_ml")
+    .merge(border_ml)
+    .attr("d", path)
+    .style("stroke-width", 1.2)
+    .style("stroke", color_border)
+    .style("stroke-opacity", 0.8)
+    .attr("fill", "none")
+    })
+
+    d3.json("https://raw.githubusercontent.com/schlegeltobias/maps_switzerland/main/g1g18_lonlat_wallis.json", function(error, json) {
+
+    var border_vs = layer3.selectAll(".border_vs")
+                .data(json.features)
+    border_vs
+    .enter()
+        .append("path")
+        .attr("class", "border_vs")
+    .merge(border_vs)
+    .attr("d", path)
+    .style("stroke-width", 1.2)
+    .style("stroke", color_border)
+    .style("stroke-opacity", 0.8)
+    .attr("fill", "none")
+    })
+
+    d3.json("https://raw.githubusercontent.com/schlegeltobias/maps_switzerland/main/g1g18_lonlat_tessin_sued.json", function(error, json) {
+
+    var border_tis = layer3.selectAll(".border_tis")
+                .data(json.features)
+    border_tis
+    .enter()
+        .append("path")
+        .attr("class", "border_tis")
+    .merge(border_tis)
+    .attr("d", path)
+    .style("stroke-width", 1.2)
+    .style("stroke", color_border)
+    .style("stroke-opacity", 0.8)
+    .attr("fill", "none")
+    })
+
+
+    d3.json("https://raw.githubusercontent.com/schlegeltobias/maps_switzerland/main/g1g18_lonlat_tessin_nord.json", function(error, json) {
+
+    var border_tin = layer3.selectAll(".border_tin")
+                .data(json.features)
+    border_tin
+    .enter()
+        .append("path")
+        .attr("class", "border_tin")
+    .merge(border_tin)
+    .attr("d", path)
+    .style("stroke-width", 1.2)
+    .style("stroke", color_border)
+    .style("stroke-opacity", 0.8)
+    .attr("fill", "none")
+    })
+    
+//////////
+// Zoom //
+//////////
+
+    var zoom = d3.zoom()
+    .interpolate(d3.interpolate)
+    .scaleExtent([1,10])
+    .on("zoom", function() {
+        // the "zoom" event populates d3.event with an object that has
+        // a "translate" property (a 2-element Array in the form [x, y])
+        // and a numeric "scale" property
+        var e = d3.event.transform
+          // now, constrain the x and y components of the translation by the
+          // dimensions of the viewport
+          tx = Math.min(0, Math.max(e.x, widthValue - widthValue * e.k)),
+          ty = Math.min(0, Math.max(e.y, heightValue - heightValue * e.k));
+
+    svg.selectAll("path, .path_mun, .border_ostch, .border_ge, .border_ml, .border_vs, .border_tin, .border_tis, circle")
+                .attr("transform", ["translate(" + [tx, ty] + ")", "scale(" + e.k + ")"]
+                .join(" "));
+ 
+        })
+
+
+    // Set zoom on the group element (instead the svg element) to avoid that zooming is activated outside the map.
+    // Define one layer for zooming only is easier to avoid jumps --> Otherwise zooming jumps if the curser hits another layer. Now zooming for other layers (i.e., lakes, borders, UAS points) is disabled.
+    layer2.call(zoom)
+
+//-----------------//
+// Set initial map //
+//-----------------//
+
+document.getElementById("radio_fe2").checked = true;
+var selectedMeasure = "fe"
+updatePrecon()
+
+</script>
+
+
+	</body>
+</html>
